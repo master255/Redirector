@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Configuration;
+using System.Net;
 
 namespace Redirector
 {
@@ -33,10 +34,18 @@ namespace Redirector
                                 {
                                     tempNum = Int32.Parse(ConfigurationManager.AppSettings["num"]);
                                     startInfo.Arguments = "http" + arg1.Substring(6 + tempNum);
-                                    Process.Start(startInfo);
+                                    WebServer ws = new WebServer(SendResponse, "http://127.0.0.1:7777/check/");
+                                    ws.Run();
+                                    var process = Process.Start(startInfo);
+                                    process.WaitForExit();
+                                    ws.Stop();
+
                                 }
                                 catch (Exception exception)
-                                {}
+                                {
+                                
+                                }
+                                
                             }
                         }
                     }
@@ -46,8 +55,13 @@ namespace Redirector
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+
                 Application.Run(new Form1());
             }
+        }
+        public static string SendResponse(HttpListenerRequest request)
+        {
+            return string.Format("1");
         }
     }
 }
